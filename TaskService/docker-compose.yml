@@ -1,0 +1,54 @@
+﻿services:
+  taskapi:
+    image: ${DOCKER_REGISTRY-}taskapi
+    build:
+      context: .
+      dockerfile: TaskApi/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__TaskDb: "Host=postgres;Port=5432;Database=taskapi;Username=taskapi;Password=taskapi_dev_password"
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__UserName: taskapi
+      RabbitMq__Password: taskapi_dev_password
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: taskapi
+      POSTGRES_PASSWORD: taskapi_dev_password
+      POSTGRES_DB: taskapi
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskapi -d taskapi"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: taskapi-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: taskapi
+      RABBITMQ_DEFAULT_PASS: taskapi_dev_password
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+
+volumes:
+  postgres-data:
+  rabbitmq-data:

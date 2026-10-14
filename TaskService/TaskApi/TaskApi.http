@@ -1,0 +1,34 @@
+﻿@TaskApi_HostAddress = https://localhost:5081
+
+POST {{TaskApi_HostAddress}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Проверить создание задачи"
+}
+
+###
+POST {{TaskApi_HostAddress}}/tasks
+Content-Type: application/json
+
+{
+  "title": "   "
+}
+
+###
+POST {{TaskApi_HostAddress}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Проверка приоритета",
+  "priority": 99
+}
+
+###
+GET {{TaskApi_HostAddress}}/tasks
+
+###
+DELETE {{TaskApi_HostAddress}}/tasks/d64b448a-4b49-4e3c-bcaf-406088a97368
+
+###
+PUT {{TaskApi_HostAddress}}/tasks/8ef943b5-4903-4084-99d6-8d084e3b4c95/complete
